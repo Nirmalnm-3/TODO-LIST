@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do Landing</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f0f4f8;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .todo-container {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+
+    .card {
+      border-radius: 15px;
+      overflow: hidden;
+      position: relative;
+      color: #fff;
+      min-height: 200px;
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: end;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      backdrop-filter: blur(4px);
+      background: rgba(0,0,0,0.3);
+      z-index: 0;
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 10px;
+    }
+
+    h2 {
+      color: #333;
+    }
+
+    .add-task-form {
+      margin-bottom: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-5">
+    <div class="todo-container">
+      <h2 class="mb-4 text-center">📝 Your To-Do List</h2>
+
+      <!-- Add Task Section -->
+      <form class="add-task-form row g-3 justify-content-center" id="addTaskForm">
+        <div class="col-md-8">
+          <input type="text" id="newTaskInput" class="form-control" placeholder="Add a new task..." required>
+        </div>
+        <div class="col-md-2">
+          <button type="submit" class="btn btn-success w-100">Add</button>
+        </div>
+      </form>
+
+      <div class="row" id="todo-list"></div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="todoModal" tabindex="-1" aria-labelledby="todoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content text-dark">
+        <div class="modal-header">
+          <h5 class="modal-title" id="todoModalLabel">Task Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="modalBodyContent"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const images = [
+      'https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1616627981269-2b443e8ba021?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1584697964404-b2d3bff09486?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1557682224-5b8590cd9ec5?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1573164574230-043d77b4f41d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1581092795360-508d4dc396ec?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1593642532973-d31b6557fa68?auto=format&fit=crop&w=800&q=80'
+    ];
+
+    const container = document.getElementById('todo-list');
+    let imageIndex = 0;
+
+    function addTaskCard(todoText, completed = false, id = Date.now()) {
+      const cardWrapper = document.createElement('div');
+      cardWrapper.className = 'col-md-4 mb-4';
+
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.setAttribute('data-id', id);
+
+      card.style.backgroundImage = `url(${images[imageIndex % images.length]})`;
+      imageIndex++;
+
+      const statusClass = completed ? 'text-success' : 'text-danger';
+      const statusText = completed ? '✅ Done' : '❌ Not Done';
+
+      card.innerHTML = `
+        <div class="card-body">
+          <h5 class="card-title">${todoText}</h5>
+          <p class="card-text status-text ${statusClass}">Status: <strong>${statusText}</strong></p>
+          <div class="btn-group">
+            <button class="btn btn-sm btn-success done-btn"${completed ? ' disabled' : ''}>✅ Done</button>
+            <button class="btn btn-sm btn-danger delete-btn">🗑 Delete</button>
+          </div>
+        </div>
+      `;
+
+      card.querySelector('.done-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const statusEl = card.querySelector('.status-text');
+        statusEl.innerHTML = 'Status: <strong class="text-success">✅ Done</strong>';
+        e.target.disabled = true;
+      });
+
+      card.querySelector('.delete-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        cardWrapper.remove();
+      });
+
+      card.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('delete-btn') && !e.target.classList.contains('done-btn')) {
+          showTodoDetails(id, todoText, completed);
+        }
+      });
+
+      cardWrapper.appendChild(card);
+      container.appendChild(cardWrapper);
+    }
+
+    fetch('https://dummyjson.com/todos')
+      .then(res => res.json())
+      .then(data => {
+        const tasks = data.todos.slice(0, 9);
+        tasks.forEach((todo, index) => {
+          addTaskCard(todo.todo, index % 2 === 0 || todo.completed, todo.id);
+        });
+      });
+
+    document.getElementById('addTaskForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const taskInput = document.getElementById('newTaskInput');
+      const taskText = taskInput.value.trim();
+      if (taskText) {
+        addTaskCard(taskText, false);
+        taskInput.value = '';
+      }
+    });
+
+    function showTodoDetails(id, text, completed) {
+      const modalBody = document.getElementById('modalBodyContent');
+      modalBody.innerHTML = `
+        <p><strong>ID:</strong> ${id}</p>
+        <p><strong>Task:</strong> ${text}</p>
+        <p><strong>Completed:</strong> ${completed ? 'Yes ✅' : 'No ❌'}</p>
+      `;
+      new bootstrap.Modal(document.getElementById('todoModal')).show();
+    }
+  </script>
+</body>
+</html>

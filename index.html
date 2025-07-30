@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      background: url('https://images.unsplash.com/photo-1584433302469-1ec76cd51c8b?auto=format&fit=crop&w=1500&q=80') no-repeat center center fixed;
+      background-size: cover;
+      font-family: 'Segoe UI', sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: -1;
+    }
+
+    .decor {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      opacity: 0.3;
+      z-index: 0;
+    }
+
+    .decor1 {
+      background: #0dcaf0;
+      width: 200px;
+      height: 200px;
+      top: 5%;
+      left: 10%;
+    }
+
+    .decor2 {
+      background: #ffc107;
+      width: 150px;
+      height: 150px;
+      bottom: 10%;
+      right: 15%;
+    }
+
+    .login-box {
+      position: relative;
+      padding: 40px 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      color: #fff;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .login-box > *:not(.login-bg) {
+      position: relative;
+      z-index: 2;
+    }
+
+    .login-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+      opacity: 0.2;
+      z-index: 1;
+    }
+
+    .form-control {
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: #fff;
+    }
+
+    .form-control::placeholder {
+      color: #ddd;
+    }
+
+    .form-control:focus {
+      box-shadow: none;
+      background-color: rgba(255, 255, 255, 0.3);
+      color: #fff;
+    }
+
+    .btn-primary {
+      background: #007bff;
+      border: none;
+      transition: background 0.3s;
+    }
+
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+
+    .logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 20px;
+      display: block;
+    }
+
+    .login-box:hover {
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="decor decor1"></div>
+  <div class="decor decor2"></div>
+
+  <div class="container d-flex justify-content-center align-items-center vh-100">
+    <div class="login-box col-10 col-sm-8 col-md-6 col-lg-4 text-center" id="loginBox">
+      <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="User Icon" class="logo">
+      <h2 class="mb-4">Welcome Back</h2>
+      <form onsubmit="login(event)">
+        <div class="mb-3">
+          <input type="text" id="username" class="form-control" placeholder="Username" required>
+        </div>
+        <div class="mb-3">
+          <input type="password" id="password" class="form-control" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary w-100">Login</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function login(e) {
+      e.preventDefault();
+      window.location.href = "landing.html";
+    }
+
+    // Add background image to login box using JS
+    const loginBox = document.getElementById("loginBox");
+    const backgroundDiv = document.createElement("div");
+    backgroundDiv.classList.add("login-bg");
+    backgroundDiv.style.backgroundImage = "url('https://images.unsplash.com/photo-1607083203161-0c4fce2aeb74?auto=format&fit=crop&w=800&q=80')";
+    loginBox.prepend(backgroundDiv);
+  </script>
+</body>
+</html>
